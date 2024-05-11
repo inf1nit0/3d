@@ -31,8 +31,8 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Añadimos una luz ambiental
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        // Añadimos una luz ambiental suave
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
         scene.add(ambientLight);
 
         // Añadimos una luz direccional
