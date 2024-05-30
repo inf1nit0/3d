@@ -1,0 +1,26 @@
+<!-- principal.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Página Principal</title>
+    <style>
+        body { margin: 0; }
+        iframe {
+            width: 600px;
+            height: 300px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <iframe id="modeloFrame"></iframe>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var iframe = document.getElementById('modeloFrame');
+            iframe.src = 'modelo.html';
+        });
+    </script>
+</body>
+</html>
