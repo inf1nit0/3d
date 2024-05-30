@@ -29,7 +29,7 @@
 
         // Gestión de la exposición y gamma
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 0.5;  // Ajustar la exposición según sea necesario
+        renderer.toneMappingExposure = 1;  // Ajustar la exposición según sea necesario
         renderer.outputEncoding = THREE.sRGBEncoding;
 
         let model;
@@ -42,7 +42,7 @@
             // Ajustar la intensidad de las luces importadas
             gltf.scene.traverse(function (node) {
                 if (node.isLight) {
-                    node.intensity *= 0.003; // Reducir la intensidad de las luces
+                    node.intensity *= 0.01; // Reducir la intensidad de las luces
                 }
             });
 
@@ -101,7 +101,7 @@
 
         // Evento para el zoom
         document.addEventListener('wheel', (event) => {
-            const zoomSpeed = 0.1;
+            const zoomSpeed = 0.5;
             if (event.deltaY < 0) {
                 camera.position.z -= zoomSpeed;
             } else {
