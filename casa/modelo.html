@@ -15,13 +15,17 @@
     <script>
         // Crear la escena
         const scene = new THREE.Scene();
+        
+        // Cambiar el color de fondo de la escena
+        scene.background = new THREE.Color(0x87ceeb); // Color azul cielo, por ejemplo
+
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-const color2 = new THREE.Color( 0xff0000 );
+
         // Configurar la cámara
-        camera.position.set(1, 1, 8);
+        camera.position.set(-5, -2, 6);
 
         // Gestión de la exposición y gamma
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -38,7 +42,7 @@ const color2 = new THREE.Color( 0xff0000 );
             // Ajustar la intensidad de las luces importadas
             gltf.scene.traverse(function (node) {
                 if (node.isLight) {
-                    node.intensity *= 0.01; // Reducir la intensidad de las luces
+                    node.intensity *= 0.003; // Reducir la intensidad de las luces
                 }
             });
 
