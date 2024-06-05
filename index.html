@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js GLB Loader</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/GLTFLoader.js"></script>
+    <script>
+        // Crear la escena
+        const scene = new THREE.Scene();
+        
+        // Cambiar el color de fondo de la escena
+        scene.background = new THREE.Color(0x87ceeb); // Color azul cielo, por ejemplo
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Configurar la cámara
+        camera.position.set(-5, -2, 6);
+
+        // Gestión de la exposición y gamma
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1;  // Ajustar la exposición según sea necesario
+        renderer.outputEncoding = THREE.sRGBEncoding;
+
+        let model;
+        let isDragging = false;
+        let isRightClick = false;
+        let previousMousePosition = { x: 0, y: 0 };
+
+        // Cargar el archivo GLB
+        const loader = new THREE.GLTFLoader();
+        loader.load('car.glb', function (gltf) {
+            // Ajustar la intensidad de las luces importadas
+            gltf.scene.traverse(function (node) {
+                if (node.isLight) {
+                    node.intensity *= 0.01; // Reducir la intensidad de las luces
+                }
+            });
+
+            // Añadir el modelo a la escena
+            model = gltf.scene;
+            scene.add(model);
+
+            // Renderizar la escena
+            const animate = function () {
+                requestAnimationFrame(animate);
+                renderer.render(scene, camera);
+            };
+            animate();
+        }, undefined, function (error) {
+            console.error(error);
+        });
+
+        // Ajustar el tamaño del renderizador al cambiar el tamaño de la ventana
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Eventos del ratón
+        document.addEventListener('mousedown', (event) => {
+            isDragging = true;
+            isRightClick = (event.button === 2); // Verifica si es clic derecho
+            previousMousePosition = {
+                x: event.clientX,
+                y: event.clientY
+            };
+        });
+
+        document.addEventListener('mousemove', (event) => {
+            if (isDragging && model) {
+                const deltaMove = {
+                    x: event.clientX - previousMousePosition.x,
+                    y: event.clientY - previousMousePosition.y
+                };
+
+                if (isRightClick) {
+                    // Mover el modelo
+                    const moveSpeed = 0.01;
+                    model.position.x += deltaMove.x * moveSpeed;
+                    model.position.y -= deltaMove.y * moveSpeed; // Invertir Y para mover en la dirección correcta
+                } else {
+                    // Rotar el modelo
+                    const rotationSpeed = 0.005;
+                    model.rotation.y += deltaMove.x * rotationSpeed;
+                    model.rotation.x += deltaMove.y * rotationSpeed;
+                }
+
+                previousMousePosition = {
+                    x: event.clientX,
+                    y: event.clientY
+                };
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Prevenir el menú contextual en clic derecho
+        document.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+        });
+
+        // Evento para el zoom
+        document.addEventListener('wheel', (event) => {
+            const zoomSpeed = 0.5;
+            if (event.deltaY < 0) {
+                camera.position.z -= zoomSpeed;
+            } else {
+                camera.position.z += zoomSpeed;
+            }
+        });
+    </script>
+</body>
+</html>
