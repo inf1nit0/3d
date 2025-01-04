@@ -35,7 +35,7 @@
         let model;
         let isDragging = false;
         let isRightClick = false;
-        let previousMousePosition = { x: 0, y: 0 };
+        let previousPosition = { x: 0, y: 0 };
 
         // Cargar el archivo GLB
         const loader = new THREE.GLTFLoader();
@@ -72,7 +72,7 @@
         document.addEventListener('mousedown', (event) => {
             isDragging = true;
             isRightClick = (event.button === 2); // Verifica si es clic derecho
-            previousMousePosition = {
+            previousPosition = {
                 x: event.clientX,
                 y: event.clientY
             };
@@ -81,8 +81,8 @@
         document.addEventListener('mousemove', (event) => {
             if (isDragging && model) {
                 const deltaMove = {
-                    x: event.clientX - previousMousePosition.x,
-                    y: event.clientY - previousMousePosition.y
+                    x: event.clientX - previousPosition.x,
+                    y: event.clientY - previousPosition.y
                 };
 
                 if (isRightClick) {
@@ -97,7 +97,7 @@
                     model.rotation.x += deltaMove.y * rotationSpeed;
                 }
 
-                previousMousePosition = {
+                previousPosition = {
                     x: event.clientX,
                     y: event.clientY
                 };
@@ -121,6 +121,65 @@
             } else {
                 camera.position.z += zoomSpeed;
             }
+        });
+
+        // Eventos táctiles
+        document.addEventListener('touchstart', (event) => {
+            if (event.touches.length === 1) {
+                isDragging = true;
+                previousPosition = {
+                    x: event.touches[0].clientX,
+                    y: event.touches[0].clientY
+                };
+            }
+        });
+
+        document.addEventListener('touchmove', (event) => {
+            if (isDragging && model && event.touches.length === 1) {
+                const deltaMove = {
+                    x: event.touches[0].clientX - previousPosition.x,
+                    y: event.touches[0].clientY - previousPosition.y
+                };
+
+                const rotationSpeed = 0.005;
+                model.rotation.y += deltaMove.x * rotationSpeed;
+                model.rotation.x += deltaMove.y * rotationSpeed;
+
+                previousPosition = {
+                    x: event.touches[0].clientX,
+                    y: event.touches[0].clientY
+                };
+            }
+        });
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        document.addEventListener('touchmove', (event) => {
+            if (event.touches.length === 2) {
+                // Zoom con dos dedos
+                event.preventDefault();
+                const touch1 = event.touches[0];
+                const touch2 = event.touches[1];
+
+                const distance = Math.sqrt(
+                    Math.pow(touch2.clientX - touch1.clientX, 2) +
+                    Math.pow(touch2.clientY - touch1.clientY, 2)
+                );
+
+                if (previousPosition.distance) {
+                    const zoomSpeed = 0.01;
+                    const deltaDistance = distance - previousPosition.distance;
+                    camera.position.z -= deltaDistance * zoomSpeed;
+                }
+
+                previousPosition.distance = distance;
+            }
+        });
+
+        document.addEventListener('touchend', () => {
+            previousPosition.distance = null;
         });
     </script>
 </body>
